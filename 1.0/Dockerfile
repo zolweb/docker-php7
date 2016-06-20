@@ -8,10 +8,7 @@ RUN apt-get update -qq && apt-get install -qqy \
         libicu-dev \
         libmcrypt-dev \
         wget \
-
-    && wget http://xdebug.org/files/xdebug-2.4.0rc2.tgz \
-    && tar -xzvf xdebug-2.4.0rc2.tgz \
-    && mv xdebug-2.4.0RC2 /usr/src/php/ext/xdebug \
+        apt-utils \
 
     && docker-php-ext-configure intl \
     && docker-php-ext-install -j$(nproc) \
@@ -22,7 +19,6 @@ RUN apt-get update -qq && apt-get install -qqy \
        pdo_mysql \
        mbstring \
        opcache \
-       xdebug \
        zip \
 
     && pecl install apcu \
