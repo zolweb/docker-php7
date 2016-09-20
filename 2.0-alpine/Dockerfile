@@ -35,11 +35,25 @@ RUN set -x && \
        bz2 \
     && rm -rf /var/cache/apk/*
 
+ARG APCU_VERSION=5.1.5
+ARG APCU_BC_VERSION=1.0.3
+
+RUN apk update \
+  && apk add --no-cache --virtual .build-php \
+    $PHPIZE_DEPS \
+  && pecl install apcu-$APCU_VERSION \
+  && docker-php-ext-enable apcu \
+  && pecl install apcu_bc-$APCU_BC_VERSION \
+  && docker-php-ext-enable apc \
+  && rm -f /usr/local/etc/php/conf.d/docker-php-ext-apc.ini \
+  && rm -f /usr/local/etc/php/conf.d/docker-php-ext-apcu.ini
+
+COPY conf/*.ini /usr/local/etc/php/conf.d/
+
 # apcu
-RUN apk add --no-cache autoconf gcc g++ make zip unzip libc-dev make bzip2-dev \
-    && pecl install apcu \
-    && echo "extension=apcu.so" > /usr/local/etc/php/conf.d/ext-apcu.ini \
-    && apk del autoconf gcc g++ make zip unzip libc-dev make bzip2-dev
+#RUN apk add --no-cache autoconf gcc g++ make zip unzip libc-dev make bzip2-dev \
+#    && pecl install apc apcu \
+#    && echo "extension=apcu.so" > /usr/local/etc/php/conf.d/ext-apcu.ini
 
 COPY conf/php.ini /usr/local/etc/php/php.ini
 
