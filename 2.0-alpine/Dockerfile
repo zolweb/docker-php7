@@ -1,0 +1,49 @@
+FROM php:7.0.11-fpm-alpine
+
+# Install tzdata and change to Europe/Paris
+RUN  set -x && \
+    apk --update add tzdata acl && \
+    ln -sf /usr/share/zoneinfo/Europe/Paris /etc/localtime && \
+    date && \
+    rm -rf /var/cache/apk/*
+
+# Install tools...
+RUN set -x && \
+    apk --update add \
+      mysql-client \
+      sudo \
+      bash \
+      zlib-dev \
+      wget \
+      icu \
+      icu-libs \
+      icu-dev \
+      freetype libpng libjpeg-turbo freetype-dev libpng-dev libjpeg-turbo-dev \
+    && docker-php-ext-configure intl \
+    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+    && docker-php-ext-install \
+       iconv \
+       mcrypt \
+       intl \
+       pdo \
+       pdo_mysql \
+       mbstring \
+       opcache \
+       zip \
+       gd \
+       exif \
+       bz2 \
+    && rm -rf /var/cache/apk/*
+
+# apcu
+RUN apk add --no-cache autoconf gcc g++ make zip unzip libc-dev make bzip2-dev \
+    && pecl install apcu \
+    && echo "extension=apcu.so" > /usr/local/etc/php/conf.d/ext-apcu.ini \
+    && apk del autoconf gcc g++ make zip unzip libc-dev make bzip2-dev
+
+COPY conf/php.ini /usr/local/etc/php/php.ini
+
+COPY script/start.sh /root/start.sh
+RUN chmod +x /root/start.sh
+
+CMD ["/root/start.sh"]
