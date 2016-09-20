@@ -39,6 +39,22 @@ symfony_cache_clear_alias() {
 }
 
 
+symfony_acls() {
+
+    echo "Setting ACLs"
+    [ -z $CUSTOM_UID ] && echo "Environment variable CUSTOM_UID not found" && exit 1
+
+    if [ "$(uname)" == "Darwin" ]; then
+        chmod -R +a "$CUSTOM_UID allow delete,write,append,file_inherit,directory_inherit" /var/www/html/var
+        chmod -R +a "www-data allow delete,write,append,file_inherit,directory_inherit" /var/www/html/var
+    else
+        setfacl -R -m u:"$CUSTOM_UID":rwX -m u:"www-data":rwX /var/www/html/var
+        setfacl -dR -m u:"$CUSTOM_UID":rwX -m u:"www-data":rwX /var/www/html/var
+    fi
+}
+
+
+symfony_acls
 symfony_env_variables
 symfony_cache_clear_alias
 
