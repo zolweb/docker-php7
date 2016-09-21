@@ -58,4 +58,5 @@ symfony_acls
 symfony_env_variables
 symfony_cache_clear_alias
 
+crond &
 php-fpm

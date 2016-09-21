@@ -2,7 +2,7 @@ FROM php:7.0.11-fpm-alpine
 
 # Install tzdata and change to Europe/Paris
 RUN  set -x && \
-    apk --update add tzdata acl && \
+    apk --update add tzdata acl logrotate && \
     ln -sf /usr/share/zoneinfo/Europe/Paris /etc/localtime && \
     date && \
     rm -rf /var/cache/apk/*
@@ -48,16 +48,17 @@ RUN apk update \
   && rm -f /usr/local/etc/php/conf.d/docker-php-ext-apc.ini \
   && rm -f /usr/local/etc/php/conf.d/docker-php-ext-apcu.ini
 
-COPY conf/*.ini /usr/local/etc/php/conf.d/
 
-# apcu
-#RUN apk add --no-cache autoconf gcc g++ make zip unzip libc-dev make bzip2-dev \
-#    && pecl install apc apcu \
-#    && echo "extension=apcu.so" > /usr/local/etc/php/conf.d/ext-apcu.ini
+# Custom logrotate configuration for symfony
+ADD logrotate/symfony /etc/logrotate.d/symfony
+ADD logrotate/cron /etc/periodic/daily/logrotate-cron
 
-COPY conf/php.ini /usr/local/etc/php/php.ini
+# Custom PHP (and apc) configuration
+COPY php/*.ini /usr/local/etc/php/conf.d/
+COPY php/php.ini /usr/local/etc/php/php.ini
 
 COPY script/start.sh /root/start.sh
-RUN chmod +x /root/start.sh
+RUN chmod +x /root/start.sh \
+  && chmod +x /etc/periodic/daily/logrotate-cron
 
 CMD ["/root/start.sh"]
