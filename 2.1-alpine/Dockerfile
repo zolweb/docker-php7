@@ -49,6 +49,12 @@ RUN apk update \
   && rm -f /usr/local/etc/php/conf.d/docker-php-ext-apcu.ini
 
 
+RUN apk upgrade --update \
+	&& apk add --no-cache --virtual \
+    && pecl install xdebug \
+    && docker-php-ext-enable xdebug \
+    && sed -i -e "s/zend_extension/#zend_extension/g" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+
 # Custom logrotate configuration for symfony
 ADD logrotate/symfony /etc/logrotate.d/symfony
 ADD logrotate/cron /etc/periodic/daily/logrotate-cron
