@@ -48,8 +48,9 @@ symfony_acls() {
         chmod -R +a "$CUSTOM_UID allow delete,write,append,file_inherit,directory_inherit" /var/www/html/var
         chmod -R +a "www-data allow delete,write,append,file_inherit,directory_inherit" /var/www/html/var
     else
-        setfacl -R -m u:"$CUSTOM_UID":rwX -m u:"www-data":rwX /var/www/html/var
-        setfacl -dR -m u:"$CUSTOM_UID":rwX -m u:"www-data":rwX /var/www/html/var
+
+        setfacl -R -m u:"$CUSTOM_UID":rwX -m u:"www-data":rwX /var/www/html/var /var/www/html/web
+        setfacl -dR -m u:"$CUSTOM_UID":rwX -m u:"www-data":rwX /var/www/html/var /var/www/html/web
     fi
 }
 

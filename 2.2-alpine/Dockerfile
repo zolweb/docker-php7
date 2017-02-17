@@ -13,6 +13,7 @@ RUN set -x && \
       mysql-client \
       sudo \
       bash \
+      grep \
       bzip2-dev \
       zlib-dev \
       wget \
