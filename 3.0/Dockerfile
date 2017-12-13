@@ -12,6 +12,7 @@ RUN apt-get update -qq && apt-get install -qqy \
     unzip \
     tzdata \
     netcat \
+    cron \
     apt-transport-https lsb-release ca-certificates \
     software-properties-common python-software-properties \
     && echo "Europe/Paris" > /etc/timezone && dpkg-reconfigure -f noninteractive tzdata \
@@ -42,15 +43,14 @@ ADD logrotate/cron /etc/periodic/daily/logrotate-cron
 COPY php/*.ini /usr/local/etc/php/conf.d/
 COPY php/php.ini /usr/local/etc/php/php.ini
 
-COPY script/start.sh /var/www/start.sh
-COPY script/entry.sh /var/www/entry.sh
+COPY script/start.sh /root/start.sh
+COPY script/entry.sh /root/entry.sh
 
 # Make sure every user can start the container
-RUN chmod 0777 /var/www/start.sh /var/www/entry.sh \
-  && chmod +x /etc/periodic/daily/logrotate-cron \
-  && rm -rf /var/www/html
+RUN chmod +x /root/start.sh /root/entry.sh \
+  && chmod +x /etc/periodic/daily/logrotate-cron
 
-WORKDIR /var/www/
+WORKDIR /var/www/html
 
-ENTRYPOINT ["/var/www/entry.sh"]
-CMD ["/var/www/start.sh"]
+ENTRYPOINT ["/root/entry.sh"]
+CMD ["/root/start.sh"]

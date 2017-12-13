@@ -1,43 +1,35 @@
 #!/usr/bin/env bash
 set -o errexit
 
-__DIR__="$(cd "$(dirname "${0}")"; echo $(pwd))"
-__BASE__="$(basename "${0}")"
-__FILE__="${__DIR__}/${__BASE__}"
-
-symfony_acls() {
-    echo "Setting ACLs"
-
-    if [ "$(uname)" == "Darwin" ]; then
-        chmod -R +a "www-data allow delete,write,append,file_inherit,directory_inherit" /var/www/html
-    else
-
-        setfacl -R  -m u:"www-data":rwX /var/www/html
-        setfacl -dR -m u:"www-data":rwX /var/www/html
-    fi
-}
-
 php_logs() {
-  local conf_file="/usr/local/etc/php-fpm.d/www.conf"
+    if [ ! -z "$UID" ] && [ ! -z "$GID" ]; then
+        local conf_file="/usr/local/etc/php-fpm.d/www.conf"
 
-  local log_dir="/var/log/php"
-  local access_log_file="${log_dir}/fpm-access.log"
-  local error_log_file="${log_dir}/fpm-error.log"
+        local log_dir="/var/log/php"
+        local access_log_file="${log_dir}/access.log"
+        local error_log_file="${log_dir}/error.log"
 
-  mkdir -p ${log_dir} \
-    && touch ${access_log_file} \
-    && touch ${error_log_file} \
-    && chown -R www-data:www-data ${log_dir} \
+        mkdir -p ${log_dir} \
+            && touch ${access_log_file} \
+            && touch ${error_log_file} \
+            && chown -R $UID:$GID ${log_dir}
 
-  sed -i '/^;catch_workers_output/catch_workers_output = yes' ${conf_file} \
-    && sed -i '/^;access.log/access.log = /var/log/php/fpm-access.log' ${conf_file} \
-    && sed -i '/^;php_flag\[display_errors\]/php_flag[display_errors] = off' ${conf_file} \
-    && sed -i '/^;php_admin_value\[error_log\]/php_admin_value[error_log] = /var/log/php/fpm-error.log' ${conf_file} \
-    && sed -i '/^;php_admin_flag\[log_errors\]/php_admin_flag[log_errors] = on' ${conf_file}
+        # The "c" supplementary letter is needed because the first letter will be cut at replacement.
+        sed -i '/^;catch_workers_output/ccatch_workers_output = yes' ${conf_file} \
+            && sed -i '/^;log_level/clog_level = debug' ${conf_file} \
+            && sed -i '/^;listen/clisten = 9000' ${conf_file} \
+            && sed -i '/^;access.log/caccess.log = /var/log/php/access.log' ${conf_file} \
+            && sed -i '/^;php_flag\[display_errors\]/cphp_flag[display_errors] = off' ${conf_file} \
+            && sed -i '/^;php_admin_value\[error_log\]/cphp_admin_value[error_log] = /var/log/php/error.log' ${conf_file} \
+            && sed -i '/^;php_admin_flag\[log_errors\]/cphp_admin_flag[log_errors] = on' ${conf_file} \
+            && sed -i '/^;clear_env/cclear_env = no' ${conf_file}
+    fi
+
+    setfacl -R  -m u:"www-data":rwX -m u:"root":rwX /var/www/html
+    setfacl -dR -m u:"www-data":rwX -m u:"root":rwX /var/www/html
 }
 
-#symfony_acls
-#php_logs
+php_logs
 
-#crond &
+cron -L 15
 php-fpm --nodaemonize
