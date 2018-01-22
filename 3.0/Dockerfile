@@ -18,9 +18,8 @@ RUN apt-get update -qq && apt-get install -qqy \
     libfreetype6-dev libjpeg-dev \
     apt-transport-https lsb-release ca-certificates \
     software-properties-common python-software-properties \
-    libbz2-dev
-
-RUN echo "Europe/Paris" > /etc/timezone && dpkg-reconfigure -f noninteractive tzdata \
+    libbz2-dev \
+    && echo "Europe/Paris" > /etc/timezone && dpkg-reconfigure -f noninteractive tzdata \
     && echo 'alias ll="ls -lah --color=auto"' >> /etc/bash.bashrc \
     && docker-php-ext-configure intl \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
