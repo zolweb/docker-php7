@@ -25,6 +25,7 @@ RUN mkdir /run/php \
     && sh -c 'echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list' \
     && apt-get update -qq && apt-get upgrade -qqy \
     && apt-get install -qqy \
+    php$PHP_VERSION-cli \
     php$PHP_VERSION-intl \
     php$PHP_VERSION-mysql \
     php$PHP_VERSION-curl \
@@ -32,7 +33,10 @@ RUN mkdir /run/php \
     php$PHP_VERSION-xml  \
     php$PHP_VERSION-opcache \
     php$PHP_VERSION-dev \
-    php$PHP_VERSION-bcmath
+    php$PHP_VERSION-bcmath \
+    && docker-php-ext-install \
+        pdo \
+        pdo_mysql
 
 # Custom logrotate configuration for symfony
 ADD logrotate/symfony /etc/logrotate.d/symfony
