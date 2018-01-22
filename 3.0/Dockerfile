@@ -13,30 +13,29 @@ RUN apt-get update -qq && apt-get install -qqy \
     tzdata \
     netcat \
     cron \
+    libicu-dev \
+    libmcrypt-dev \
+    libfreetype6-dev libjpeg-dev \
     apt-transport-https lsb-release ca-certificates \
     software-properties-common python-software-properties \
-    && echo "Europe/Paris" > /etc/timezone && dpkg-reconfigure -f noninteractive tzdata \
-    && echo 'alias ll="ls -lah --color=auto"' >> /etc/bash.bashrc
+    libbz2-dev
 
-ENV PHP_VERSION 7.1
-
-RUN mkdir /run/php \
-    && wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg \
-    && sh -c 'echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list' \
-    && apt-get update -qq && apt-get upgrade -qqy \
-    && apt-get install -qqy \
-    php$PHP_VERSION-cli \
-    php$PHP_VERSION-intl \
-    php$PHP_VERSION-mysql \
-    php$PHP_VERSION-curl \
-    php$PHP_VERSION-gd \
-    php$PHP_VERSION-xml  \
-    php$PHP_VERSION-opcache \
-    php$PHP_VERSION-dev \
-    php$PHP_VERSION-bcmath \
+RUN echo "Europe/Paris" > /etc/timezone && dpkg-reconfigure -f noninteractive tzdata \
+    && echo 'alias ll="ls -lah --color=auto"' >> /etc/bash.bashrc \
+    && docker-php-ext-configure intl \
+    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-install \
-        pdo \
-        pdo_mysql
+       iconv \
+       mcrypt \
+       intl \
+       pdo \
+       pdo_mysql \
+       mbstring \
+       opcache \
+       zip \
+       gd \
+       exif \
+       bz2
 
 # Custom logrotate configuration for symfony
 ADD logrotate/symfony /etc/logrotate.d/symfony
