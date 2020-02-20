@@ -14,4 +14,6 @@ See docker hub image [zolweb/php7](https://hub.docker.com/r/zolweb/php7/)
 | 3.0            | php:7.1-fpm                  | 4.x                         | Re switch to debian base, update conf for SF4 |
 | 4.0            | php:7.2-fpm                  | 4.x                         | Upgrade to php 7.2 |
 | 4.1            | php:7.2-fpm                  | 4.x                         | Add mariadb-client |
+| 4.2            | php:7.2-fpm                  | 4.x                         | Add composer to image |
 | 5.0            | php:7.4-fpm                  | 4.x                         | Upgrade to php 7.4 |
+| 5.1            | php:7.4-fpm                  | 4.x                         | Add composer to image |
