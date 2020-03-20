@@ -1,4 +1,5 @@
 # docker-php7
+
 A docker image with php 7 and extensions (apc, apcu, intl, mcrypt,...)
 
 See docker hub image [zolweb/php7](https://hub.docker.com/r/zolweb/php7/)
@@ -16,4 +17,5 @@ See docker hub image [zolweb/php7](https://hub.docker.com/r/zolweb/php7/)
 | 4.1            | php:7.2-fpm                  | 4.x                         | Add mariadb-client |
 | 4.2            | php:7.2-fpm                  | 4.x                         | Add composer to image |
 | 5.0            | php:7.4-fpm                  | 4.x                         | Upgrade to php 7.4 |
-| 5.1            | php:7.4-fpm                  | 4.x                         | Add composer to image |
+| 5.1            | php:7.4-fpm                  | 4.x -> 5.x                  | Add composer to image |
+| 5.2            | php:7.4-fpm                  | 4.x -> 5.x                  | Change scripts owner to allow to be run as non root user, remove setfacl to be used on Docker for Mac |
